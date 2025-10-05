@@ -12,6 +12,7 @@ export default function Home() {
   });
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
+  const [toneLoading, setToneLoading] = useState<string | null>(null); // 어떤 톤 버튼이 로딩중인지
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -43,7 +44,11 @@ export default function Home() {
       return;
     }
 
-    setLoading(true);
+    if (tone) {
+      setToneLoading(tone); // 톤 버튼 로딩 시작
+    } else {
+      setLoading(true);
+    }
     
     try {
       const imagesBase64 = await Promise.all(
@@ -68,7 +73,6 @@ export default function Home() {
 
       if (data.error) {
         alert('오류: ' + data.error);
-        setLoading(false);
         return;
       }
 
@@ -78,89 +82,93 @@ export default function Home() {
       alert('AI 생성 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
+      setToneLoading(null); // 톤 버튼 로딩 종료
     }
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(description);
+    alert('설명문이 복사되었습니다!');
+  };
+
   return (
-  <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    {/* 헤더 */}
-    <header className="bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-3">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-black rounded-2xl flex items-center justify-center">
-            <span className="text-white text-xl">🏠</span>
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">방글방글</h1>
-            <p className="text-xs text-gray-500">매물 설명문 AI</p>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    {/* 메인 컨텐츠 */}
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      {/* 타이틀 */}
-      <div className="text-center mb-6">
-        <div className="w-16 h-16 bg-black rounded-3xl mx-auto mb-4 flex items-center justify-center">
-          <span className="text-3xl">🏠</span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-          매물 설명문, 이제 쉽게 써보세요
-        </h2>
-        <p className="text-gray-600">
-          정보만 입력하면 AI가 멋진 소개글을 만들어드려요 ✨
-        </p>
-      </div>
-
-      {/* 메인 카드 */}
-      <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
-        {/* 입력 필드 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <span className="text-xl mr-2">📐</span>
-              평수
-            </label>
-            <input
-              type="text"
-              placeholder="예: 32평"
-              value={propertyInfo.area}
-              onChange={(e) => setPropertyInfo({...propertyInfo, area: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
-            />
-          </div>
-          
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <span className="text-xl mr-2">🔥</span>
-              가격
-            </label>
-            <input
-              type="text"
-              placeholder="예: 5억 2천만원"
-              value={propertyInfo.price}
-              onChange={(e) => setPropertyInfo({...propertyInfo, price: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
-            />
-          </div>
-          
-          <div>
-            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-              <span className="text-xl mr-2">📍</span>
-              위치
-            </label>
-            <input
-              type="text"
-              placeholder="예: 강남구 역삼동"
-              value={propertyInfo.location}
-              onChange={(e) => setPropertyInfo({...propertyInfo, location: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
-            />
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* 헤더 */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-black rounded-2xl flex items-center justify-center">
+              <span className="text-white text-xl">🏠</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">방글방글</h1>
+              <p className="text-xs text-gray-500">매물 설명문 AI</p>
+            </div>
           </div>
         </div>
+      </header>
 
-        {/* 나머지는 동일 */}
+      {/* 메인 컨텐츠 */}
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {/* 타이틀 */}
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-black rounded-3xl mx-auto mb-4 flex items-center justify-center">
+            <span className="text-3xl">🏠</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            매물 설명문, 이제 쉽게 써보세요
+          </h2>
+          <p className="text-gray-600">
+            정보만 입력하면 AI가 멋진 소개글을 만들어드려요 ✨
+          </p>
+        </div>
+
+        {/* 메인 카드 */}
+        <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
+          {/* 입력 필드 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div>
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                <span className="text-xl mr-2">📐</span>
+                평수
+              </label>
+              <input
+                type="text"
+                placeholder="예: 32평"
+                value={propertyInfo.area}
+                onChange={(e) => setPropertyInfo({...propertyInfo, area: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+              />
+            </div>
+            
+            <div>
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                <span className="text-xl mr-2">🔥</span>
+                가격
+              </label>
+              <input
+                type="text"
+                placeholder="예: 5억 2천만원"
+                value={propertyInfo.price}
+                onChange={(e) => setPropertyInfo({...propertyInfo, price: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+              />
+            </div>
+            
+            <div>
+              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                <span className="text-xl mr-2">📍</span>
+                위치
+              </label>
+              <input
+                type="text"
+                placeholder="예: 강남구 역삼동"
+                value={propertyInfo.location}
+                onChange={(e) => setPropertyInfo({...propertyInfo, location: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+              />
+            </div>
+          </div>
 
           {/* 이미지 업로드 */}
           <div className="mb-8">
@@ -244,14 +252,28 @@ export default function Home() {
           <div className="space-y-6 animate-fadeIn">
             {/* 설명문 카드 */}
             <div className="bg-white rounded-3xl shadow-xl p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <span className="text-2xl mr-2">✨</span>
-                생성된 설명문
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                  <span className="text-2xl mr-2">✨</span>
+                  생성된 설명문
+                </h3>
+                <button
+                  onClick={copyToClipboard}
+                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all shadow-md hover:shadow-lg text-sm font-medium flex items-center"
+                >
+                  <span className="mr-1">📋</span>
+                  복사
+                </button>
+              </div>
               <textarea
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full h-48 p-6 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none text-gray-800 leading-relaxed"
+                readOnly
+                className="w-full min-h-[12rem] p-6 border border-gray-200 rounded-2xl focus:outline-none resize-none text-gray-800 leading-relaxed bg-gray-50"
+                style={{ height: 'auto' }}
+                onFocus={(e) => {
+                  // 모바일에서 포커스 방지
+                  e.target.blur();
+                }}
               />
             </div>
 
@@ -261,27 +283,63 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button 
                   onClick={() => generateDescription('professional')}
-                  disabled={loading}
-                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700"
+                  disabled={loading || toneLoading !== null}
+                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700 relative"
                 >
-                  <span className="block text-base mb-1">💼 전문적으로</span>
-                  <span className="block text-xs text-gray-500">Professional</span>
+                  {toneLoading === 'professional' ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                      </svg>
+                      작성 중...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="block text-base mb-1">💼 전문적으로</span>
+                      <span className="block text-xs text-gray-500">Professional</span>
+                    </>
+                  )}
                 </button>
                 <button 
                   onClick={() => generateDescription('friendly')}
-                  disabled={loading}
-                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700"
+                  disabled={loading || toneLoading !== null}
+                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700 relative"
                 >
-                  <span className="block text-base mb-1">😊 친근하게</span>
-                  <span className="block text-xs text-gray-500">Friendly</span>
+                  {toneLoading === 'friendly' ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                      </svg>
+                      작성 중...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="block text-base mb-1">😊 친근하게</span>
+                      <span className="block text-xs text-gray-500">Friendly</span>
+                    </>
+                  )}
                 </button>
                 <button 
                   onClick={() => generateDescription('luxury')}
-                  disabled={loading}
-                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700"
+                  disabled={loading || toneLoading !== null}
+                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700 relative"
                 >
-                  <span className="block text-base mb-1">✨ 고급스럽게</span>
-                  <span className="block text-xs text-gray-500">Luxury</span>
+                  {toneLoading === 'luxury' ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                      </svg>
+                      작성 중...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="block text-base mb-1">✨ 고급스럽게</span>
+                      <span className="block text-xs text-gray-500">Luxury</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -291,7 +349,7 @@ export default function Home() {
               <button 
                 onClick={() => {
                   navigator.clipboard.writeText(description);
-                  alert('네이버부동산용으로 복사되었습니다! 📋');
+                  alert('네이버부동산용으로 복사되었습니다!');
                 }}
                 className="px-8 py-5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-2xl hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-xl font-bold flex items-center justify-center"
               >
@@ -305,7 +363,7 @@ export default function Home() {
                     .replace(/\n\n/g, '\n')
                     .trim();
                   navigator.clipboard.writeText(zigbangFormat);
-                  alert('직방용으로 복사되었습니다! (이모지 제거) 📋');
+                  alert('직방용으로 복사되었습니다! (이모지 제거)');
                 }}
                 className="px-8 py-5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-2xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-lg hover:shadow-xl font-bold flex items-center justify-center"
               >
