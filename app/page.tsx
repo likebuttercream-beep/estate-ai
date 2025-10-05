@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function Home() {
   const [images, setImages] = useState<File[]>([]);
@@ -197,10 +198,13 @@ export default function Home() {
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {images.map((img, idx) => (
                     <div key={idx} className="relative group">
-                      <img
+                      <Image
                         src={URL.createObjectURL(img)}
                         alt={`미리보기 ${idx + 1}`}
+                        width={200}
+                        height={128}
                         className="w-full h-32 object-cover rounded-lg border border-neutral-700"
+                        unoptimized
                       />
                       <button
                         onClick={() => removeImage(idx)}

@@ -163,10 +163,10 @@ ${imageInstructions}
 설명문만 작성하세요 (다른 말 하지 말 것):`;
 
     // Gemini API 호출
-    const parts: any[] = [{ text: fullPrompt }];
+    const parts: Array<{ text?: string; inline_data?: { mime_type: string; data: string } }> = [{ text: fullPrompt }];
     
     if (images && images.length > 0) {
-      images.forEach((imageData: string) => {
+      (images as string[]).forEach((imageData: string) => {
         parts.push({
           inline_data: {
             mime_type: 'image/jpeg',
