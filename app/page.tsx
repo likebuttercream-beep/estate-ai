@@ -265,16 +265,9 @@ export default function Home() {
                   복사
                 </button>
               </div>
-              <textarea
-                value={description}
-                readOnly
-                className="w-full min-h-[12rem] p-6 border border-gray-200 rounded-2xl focus:outline-none resize-none text-gray-800 leading-relaxed bg-gray-50"
-                style={{ height: 'auto' }}
-                onFocus={(e) => {
-                  // 모바일에서 포커스 방지
-                  e.target.blur();
-                }}
-              />
+              <div className="w-full p-6 border border-gray-200 rounded-2xl text-gray-800 leading-relaxed bg-gray-50 whitespace-pre-wrap">
+                {description}
+              </div>
             </div>
 
             {/* 톤 조절 */}
