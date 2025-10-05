@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { area, price, location, tone, images } = await req.json();
+    const { area, price, location, tone, images, additionalInfo } = await req.json();
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
@@ -11,11 +11,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 톤별 전문가 프롬프트
-    let expertPrompt = '';
+    let toneInstruction = '';
+    let examples = '';
     
     if (tone === 'professional') {
-      expertPrompt = `당신은 20년 경력의 프리미엄 부동산 컨설턴트입니다.
+      toneInstruction = `당신은 20년 경력의 프리미엄 부동산 컨설턴트입니다.
 
 작성 원칙:
 - 정확한 입지 분석과 시장 가치 평가를 바탕으로 작성
@@ -41,11 +41,11 @@ ${price}
 관리 상태 우수, 즉시 입주 가능합니다."`;
       
     } else if (tone === 'friendly') {
-      expertPrompt = `당신은 친절하고 소통을 중시하는 부동산 전문가입니다.
+      toneInstruction = `당신은 친절하고 소통을 중시하는 부동산 전문가입니다.
 
 작성 원칙:
 - 실거주자 관점에서 일상의 편리함 강조
-- 구체적인 생활 시나리오 제시 ("아침에 역까지 걸어가면...")
+- 구체적인 생활 시나리오 제시
 - 따뜻하고 진정성 있는 톤
 - 이모지를 자연스럽게 활용 (3-4개)
 
@@ -62,11 +62,10 @@ ${price}
 - 주방이 넓어서 요리하기 정말 편해요
 - 수납공간이 많아서 집이 항상 깔끔해요
 
-주변에 마트, 카페, 병원 다 있어서 생활하기 딱이에요 😊
-관리 잘 된 집이라 보시면 마음에 드실 거예요!"`;
+주변에 마트, 카페, 병원 다 있어서 생활하기 딱이에요"`;
       
     } else if (tone === 'luxury') {
-      expertPrompt = `당신은 하이엔드 부동산을 전문으로 하는 럭셔리 프로퍼티 컨설턴트입니다.
+      toneInstruction = `당신은 하이엔드 부동산을 전문으로 하는 럭셔리 프로퍼티 컨설턴트입니다.
 
 작성 원칙:
 - 품격과 가치를 중시하는 표현 사용
@@ -89,11 +88,10 @@ ${area} | ${price}
 💎 천장고와 창호 시스템이 만들어내는 개방감
 💎 동선과 수납을 고려한 프리미엄 설계
 
-생활의 질을 아시는 분께 권해드립니다.
-private viewing 가능합니다."`;
+생활의 질을 아시는 분께 권해드립니다."`;
       
     } else {
-      expertPrompt = `당신은 균형잡힌 시각을 가진 부동산 전문가입니다.
+      toneInstruction = `당신은 균형잡힌 시각을 가진 부동산 전문가입니다.
 
 작성 원칙:
 - 정보 전달과 감성의 균형
@@ -112,11 +110,9 @@ ${price}
 ✅ 관리 상태 양호, 즉시 입주 가능
 
 실내는 깔끔하게 관리되어 있으며, 
-주방과 거실이 분리되어 있어 공간 활용도가 높습니다.
-주변 인프라가 잘 갖춰져 있어 실거주에 최적화된 매물입니다."`;
+주방과 거실이 분리되어 있어 공간 활용도가 높습니다."`;
     }
 
-    // 이미지 분석 지시사항
     const imageInstructions = images && images.length > 0 ? `
 
 [중요] 업로드된 ${images.length}장의 매물 사진을 정밀 분석하여:
@@ -142,27 +138,43 @@ ${price}
    - 베란다/발코니
    - 기타 차별화 포인트
 
-** 사진에서 확인되는 구체적인 내용을 설명문에 자연스럽게 녹여내세요.
-** "사진을 보니", "보시는 것처럼" 같은 표현은 사용하지 마세요.` : '';
+** 사진에서 확인되는 구체적인 내용을 설명문에 자연스럽게 녹여내세요.` : '';
 
-    const fullPrompt = `${expertPrompt}
+    const fullPrompt = `${toneInstruction}
 
 매물 정보:
 - 위치: ${location}
 - 평수: ${area}
-- 가격: ${price}
+- 가격/거래 유형: ${price}
+${additionalInfo ? `- 추가 정보: ${additionalInfo}` : ''}
 ${imageInstructions}
 
+거래 유형 자동 인식 규칙:
+1. "500/50" 형식 → 월세 (보증금 500만원/월세 50만원)
+2. "5000/50" → 월세 (보증금 5천만원/월세 50만원)  
+3. "전세 3억", "3억 전세" → 전세
+4. "매매 5억", "5억" → 매매
+5. "반전세 1억/50" → 반전세 (보증금 1억/월세 50만원)
+6. "단기 2000/100" → 단기 월세
+7. 숫자만 있으면 문맥으로 판단하여 적절한 단위 추가
+
+평수 자동 인식:
+- "25" → 25평
+- "25평" → 25평
+- "82.5" → 약 25평
+
 필수 준수사항:
-1. 과장 금지 - "파격", "절호", "놀라운" 등 사용 불가
-2. 압박 금지 - "지금 바로", "서둘러" 등 사용 불가
-3. 구체성 - 막연한 표현보다 구체적 정보
-4. 자연스러움 - 광고 카피가 아닌 전문가의 조언
-5. 길이 - 4-6줄 적정, 최대 8줄
+1. 거래 유형을 명확히 표시 (매매/전세/월세/반전세/단기)
+2. 월세는 "보증금 ○○○ / 월세 ○○" 형식으로 표기
+3. 과장 금지 - "파격", "절호", "놀라운" 등 사용 불가
+4. 압박 금지 - "지금 바로", "서둘러" 등 사용 불가
+5. 구체성 - 막연한 표현보다 구체적 정보
+6. 자연스러운 한국어
+7. 4-6줄 적정, 최대 8줄
+${additionalInfo ? '8. 추가 정보를 설명문에 자연스럽게 포함' : ''}
 
 설명문만 작성하세요 (다른 말 하지 말 것):`;
 
-    // Gemini API 호출
     const parts: Array<{ text?: string; inline_data?: { mime_type: string; data: string } }> = [{ text: fullPrompt }];
     
     if (images && images.length > 0) {
