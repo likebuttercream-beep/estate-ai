@@ -82,83 +82,85 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* 헤더 */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-black rounded-2xl flex items-center justify-center">
-              <span className="text-white text-xl">🏠</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">방글방글</h1>
-              <p className="text-xs text-gray-500">매물 설명문 AI</p>
-            </div>
+  <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    {/* 헤더 */}
+    <header className="bg-white border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-6 py-3">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-black rounded-2xl flex items-center justify-center">
+            <span className="text-white text-xl">🏠</span>
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">방글방글</h1>
+            <p className="text-xs text-gray-500">매물 설명문 AI</p>
           </div>
         </div>
-      </header>
+      </div>
+    </header>
 
-      {/* 메인 컨텐츠 */}
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        {/* 타이틀 */}
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 bg-black rounded-3xl mx-auto mb-6 flex items-center justify-center">
-            <span className="text-4xl">🏠</span>
+    {/* 메인 컨텐츠 */}
+    <div className="max-w-4xl mx-auto px-6 py-8">
+      {/* 타이틀 */}
+      <div className="text-center mb-6">
+        <div className="w-16 h-16 bg-black rounded-3xl mx-auto mb-4 flex items-center justify-center">
+          <span className="text-3xl">🏠</span>
+        </div>
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+          매물 설명문, 이제 쉽게 써보세요
+        </h2>
+        <p className="text-gray-600">
+          정보만 입력하면 AI가 멋진 소개글을 만들어드려요 ✨
+        </p>
+      </div>
+
+      {/* 메인 카드 */}
+      <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
+        {/* 입력 필드 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <span className="text-xl mr-2">📐</span>
+              평수
+            </label>
+            <input
+              type="text"
+              placeholder="예: 32평"
+              value={propertyInfo.area}
+              onChange={(e) => setPropertyInfo({...propertyInfo, area: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+            />
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            매물 설명문, 이제 쉽게 써보세요
-          </h2>
-          <p className="text-gray-600 text-lg">
-            정보만 입력하면 AI가 멋진 소개글을 만들어드려요 ✨
-          </p>
+          
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <span className="text-xl mr-2">🔥</span>
+              가격
+            </label>
+            <input
+              type="text"
+              placeholder="예: 5억 2천만원"
+              value={propertyInfo.price}
+              onChange={(e) => setPropertyInfo({...propertyInfo, price: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+            />
+          </div>
+          
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <span className="text-xl mr-2">📍</span>
+              위치
+            </label>
+            <input
+              type="text"
+              placeholder="예: 강남구 역삼동"
+              value={propertyInfo.location}
+              onChange={(e) => setPropertyInfo({...propertyInfo, location: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+            />
+          </div>
         </div>
 
-        {/* 메인 카드 */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
-          {/* 입력 필드 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <span className="text-xl mr-2">📐</span>
-                평수
-              </label>
-              <input
-                type="text"
-                placeholder="예: 32평"
-                value={propertyInfo.area}
-                onChange={(e) => setPropertyInfo({...propertyInfo, area: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
-              />
-            </div>
-            
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <span className="text-xl mr-2">🔥</span>
-                가격
-              </label>
-              <input
-                type="text"
-                placeholder="예: 5억 2천만원"
-                value={propertyInfo.price}
-                onChange={(e) => setPropertyInfo({...propertyInfo, price: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
-              />
-            </div>
-            
-            <div>
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <span className="text-xl mr-2">📍</span>
-                위치
-              </label>
-              <input
-                type="text"
-                placeholder="예: 강남구 역삼동"
-                value={propertyInfo.location}
-                onChange={(e) => setPropertyInfo({...propertyInfo, location: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
+        {/* 나머지는 동일 */}
 
           {/* 이미지 업로드 */}
           <div className="mb-8">
