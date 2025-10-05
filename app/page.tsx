@@ -14,19 +14,42 @@ export default function Home() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setImages(Array.from(e.target.files));
+      const newImages = Array.from(e.target.files);
+      setImages([...images, ...newImages]);
     }
+  };
+
+  const removeImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const convertImageToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        const base64Data = base64.split(',')[1];
+        resolve(base64Data);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   };
 
   const generateDescription = async (tone?: string) => {
     if (!propertyInfo.area || !propertyInfo.price || !propertyInfo.location) {
-      alert('평수, 가격, 위치를 모두 입력해주세요!');
+      alert('평수, 가격, 위치를 모두 입력해주세요.');
       return;
     }
 
     setLoading(true);
     
     try {
+      // 모든 이미지를 base64로 변환
+      const imagesBase64 = await Promise.all(
+        images.map(img => convertImageToBase64(img))
+      );
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -36,7 +59,8 @@ export default function Home() {
           area: propertyInfo.area,
           price: propertyInfo.price,
           location: propertyInfo.location,
-          tone: tone || 'normal', // 톤 추가!
+          tone: tone || 'normal',
+          images: imagesBase64,
         }),
       });
 
@@ -57,185 +81,278 @@ export default function Home() {
     }
   };
 
-  // 나머지 코드는 그대로...
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 text-gray-900">
-            🏠 부동산 AI 매물 설명문 생성기
-          </h1>
-          <p className="text-lg text-gray-600">
-            사진만 올리면 2분 만에 전문 설명문 완성!
+    <main className="min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900">
+      {/* 헤더 */}
+      <div className="border-b border-neutral-700/50 backdrop-blur-sm bg-neutral-900/80 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xl font-bold">E</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-light text-white tracking-wide">ESTATE AI</h1>
+                <p className="text-xs text-neutral-400 tracking-widest">PREMIUM PROPERTY SOLUTIONS</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 메인 컨텐츠 */}
+      <div className="max-w-6xl mx-auto px-6 py-16">
+        {/* 타이틀 섹션 */}
+        <div className="text-center mb-16">
+          <p className="text-amber-400 text-sm tracking-[0.3em] mb-4 font-light">AI-POWERED DESCRIPTION</p>
+          <h2 className="text-5xl md:text-6xl font-light text-white mb-6 tracking-tight">
+            Elevate Your Property
+          </h2>
+          <p className="text-neutral-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            인공지능 기술을 활용한 프리미엄 매물 설명문 생성 서비스
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-2xl p-6 md:p-10">
+        {/* 입력 카드 */}
+        <div className="bg-gradient-to-br from-neutral-800/50 to-neutral-900/50 backdrop-blur-xl rounded-2xl border border-neutral-700/50 shadow-2xl p-8 md:p-12 mb-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                평수
+          {/* 정보 입력 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="group">
+              <label className="block text-xs text-neutral-400 mb-3 tracking-widest uppercase">
+                Area
               </label>
               <input
                 type="text"
-                placeholder="예: 25평"
+                placeholder="25평"
                 value={propertyInfo.area}
                 onChange={(e) => setPropertyInfo({...propertyInfo, area: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-5 py-4 bg-neutral-900/50 border border-neutral-700 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20 transition-all duration-300"
               />
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                가격
+            <div className="group">
+              <label className="block text-xs text-neutral-400 mb-3 tracking-widest uppercase">
+                Price
               </label>
               <input
                 type="text"
-                placeholder="예: 전세 3억"
+                placeholder="전세 3억"
                 value={propertyInfo.price}
                 onChange={(e) => setPropertyInfo({...propertyInfo, price: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-5 py-4 bg-neutral-900/50 border border-neutral-700 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20 transition-all duration-300"
               />
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                위치
+            <div className="group">
+              <label className="block text-xs text-neutral-400 mb-3 tracking-widest uppercase">
+                Location
               </label>
               <input
                 type="text"
-                placeholder="예: 강남역"
+                placeholder="강남역"
                 value={propertyInfo.location}
                 onChange={(e) => setPropertyInfo({...propertyInfo, location: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-5 py-4 bg-neutral-900/50 border border-neutral-700 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20 transition-all duration-300"
               />
             </div>
           </div>
 
-          <div className="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center mb-6 hover:border-blue-400 transition">
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-              id="file-upload"
-            />
-            <label
-              htmlFor="file-upload"
-              className="cursor-pointer"
-            >
-              <div className="text-7xl mb-4">📸</div>
-              <p className="text-xl font-semibold text-gray-700 mb-2">
-                매물 사진을 업로드하세요
-              </p>
-              <p className="text-sm text-gray-500">
-                클릭하거나 드래그앤드롭 (최대 5장)
-              </p>
+          {/* 이미지 업로드 */}
+          <div className="mb-10">
+            <label className="block text-xs text-neutral-400 mb-4 tracking-widest uppercase">
+              Property Images
             </label>
+            
+            <div className="border-2 border-dashed border-neutral-700 rounded-2xl p-12 text-center hover:border-amber-500/50 transition-all duration-300 bg-neutral-900/30 group cursor-pointer">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="file-upload"
+              />
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-neutral-300 text-lg mb-2 font-light">
+                  이미지를 업로드하세요
+                </p>
+                <p className="text-neutral-500 text-sm">
+                  여러 장 선택 가능 · AI가 자동으로 분석합니다
+                </p>
+              </label>
+            </div>
+
+            {/* 업로드된 이미지 미리보기 */}
+            {images.length > 0 && (
+              <div className="mt-6">
+                <p className="text-sm text-neutral-400 mb-4">
+                  {images.length}개 이미지 선택됨
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {images.map((img, idx) => (
+                    <div key={idx} className="relative group">
+                      <img
+                        src={URL.createObjectURL(img)}
+                        alt={`미리보기 ${idx + 1}`}
+                        className="w-full h-32 object-cover rounded-lg border border-neutral-700"
+                      />
+                      <button
+                        onClick={() => removeImage(idx)}
+                        className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600"
+                      >
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                      <div className="absolute bottom-2 right-2 bg-neutral-900/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+                        {idx + 1}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {images.length > 0 && (
-            <div className="mb-6">
-              <p className="text-sm font-medium text-gray-700 mb-3">
-                📷 {images.length}개 사진 선택됨
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                {images.map((img, idx) => (
-                  <div key={idx} className="relative group">
-                    <img
-                      src={URL.createObjectURL(img)}
-                      alt={`미리보기 ${idx + 1}`}
-                      className="w-full h-24 object-cover rounded-lg shadow"
-                    />
-                    <div className="absolute top-1 right-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                      {idx + 1}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
+          {/* 생성 버튼 */}
           <button
             onClick={() => generateDescription()}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-blue-800 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition transform hover:scale-105 shadow-lg"
+            className="w-full group relative overflow-hidden bg-gradient-to-r from-amber-500 to-amber-600 text-white py-5 rounded-xl font-light text-lg tracking-wider hover:from-amber-600 hover:to-amber-700 disabled:from-neutral-700 disabled:to-neutral-800 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-amber-500/25"
           >
             {loading ? (
               <span className="flex items-center justify-center">
                 <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none"/>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                 </svg>
-                AI가 작성 중...
+                AI 분석 중...
               </span>
             ) : (
-              '✨ 설명문 자동 생성하기'
+              <span className="relative z-10">설명문 생성하기</span>
             )}
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </button>
+        </div>
 
-          {description && (
-            <div className="mt-8 space-y-4">
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl border border-green-200">
-                <h3 className="font-bold text-lg mb-3 text-gray-800 flex items-center">
-                  <span className="text-2xl mr-2">✅</span>
+        {/* 결과 */}
+        {description && (
+          <div className="space-y-6 animate-fadeIn">
+            {/* 설명문 */}
+            <div className="bg-gradient-to-br from-neutral-800/50 to-neutral-900/50 backdrop-blur-xl rounded-2xl border border-neutral-700/50 p-8 shadow-2xl">
+              <div className="flex items-center mb-6">
+                <div className="w-1 h-6 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full mr-4" />
+                <h3 className="text-neutral-300 text-lg font-light tracking-wide">
                   생성된 설명문
                 </h3>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full h-40 p-4 border border-gray-300 rounded-lg text-gray-800 leading-relaxed"
-                />
               </div>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full h-48 p-6 bg-neutral-900/50 border border-neutral-700 rounded-xl text-neutral-200 leading-relaxed focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20 transition-all duration-300 resize-none"
+              />
+            </div>
 
-              <div className="flex gap-3 flex-wrap">
+            {/* 톤 조절 버튼 */}
+            <div className="bg-gradient-to-br from-neutral-800/30 to-neutral-900/30 backdrop-blur-xl rounded-2xl border border-neutral-700/50 p-6">
+              <p className="text-xs text-neutral-400 mb-4 tracking-widest uppercase">Tone Adjustment</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button 
                   onClick={() => generateDescription('professional')}
                   disabled={loading}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:bg-gray-400"
+                  className="px-6 py-4 bg-neutral-800/50 border border-neutral-700 text-neutral-300 rounded-xl hover:border-amber-500/50 hover:bg-neutral-800 transition-all duration-300 disabled:opacity-50 font-light"
                 >
-                  💼 더 전문적으로
+                  <span className="block text-sm mb-1">Professional</span>
+                  <span className="block text-xs text-neutral-500">전문적인 톤</span>
                 </button>
                 <button 
                   onClick={() => generateDescription('friendly')}
                   disabled={loading}
-                  className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition disabled:bg-gray-400"
+                  className="px-6 py-4 bg-neutral-800/50 border border-neutral-700 text-neutral-300 rounded-xl hover:border-amber-500/50 hover:bg-neutral-800 transition-all duration-300 disabled:opacity-50 font-light"
                 >
-                  😊 더 친근하게
+                  <span className="block text-sm mb-1">Friendly</span>
+                  <span className="block text-xs text-neutral-500">친근한 톤</span>
                 </button>
                 <button 
                   onClick={() => generateDescription('luxury')}
                   disabled={loading}
-                  className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition disabled:bg-gray-400"
+                  className="px-6 py-4 bg-neutral-800/50 border border-neutral-700 text-neutral-300 rounded-xl hover:border-amber-500/50 hover:bg-neutral-800 transition-all duration-300 disabled:opacity-50 font-light"
                 >
-                  ✨ 고급스럽게
-                </button>
-              </div>
-
-              <div className="flex gap-3 flex-wrap">
-                <button 
-                  onClick={() => navigator.clipboard.writeText(description)}
-                  className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-semibold"
-                >
-                  📋 네이버부동산용 복사
-                </button>
-                <button 
-                  onClick={() => navigator.clipboard.writeText(description)}
-                  className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
-                >
-                  📋 직방용 복사
+                  <span className="block text-sm mb-1">Luxury</span>
+                  <span className="block text-xs text-neutral-500">고급스러운 톤</span>
                 </button>
               </div>
             </div>
-          )}
-        </div>
 
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>💡 매물 등록 시간을 90% 단축하세요!</p>
+            {/* 복사 버튼 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(description);
+                  alert('네이버부동산용으로 복사되었습니다.');
+                }}
+                className="group px-8 py-5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 font-light"
+              >
+                <span className="flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  네이버부동산용 복사
+                </span>
+              </button>
+              <button 
+                onClick={() => {
+                  const zigbangFormat = description
+                    .replace(/[✨🏠💰🚇✅🏛️💎😊💕👍🎉]/g, '')
+                    .replace(/\n\n/g, '\n')
+                    .trim();
+                  navigator.clipboard.writeText(zigbangFormat);
+                  alert('직방용으로 복사되었습니다. (이모지 제거)');
+                }}
+                className="group px-8 py-5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-blue-500/25 font-light"
+              >
+                <span className="flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  직방용 복사
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 푸터 */}
+      <div className="border-t border-neutral-800 mt-20">
+        <div className="max-w-6xl mx-auto px-6 py-8 text-center">
+          <p className="text-neutral-500 text-sm font-light">
+            © 2025 Estate AI. Premium Property Solutions.
+          </p>
         </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out;
+        }
+      `}</style>
     </main>
   );
 }
