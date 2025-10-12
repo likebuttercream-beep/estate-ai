@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { area, price, location, tone, images, additionalInfo } = await req.json();
+    const { area, price, location, rooms, bathrooms, floor, length, tone, images, additionalInfo } = await req.json();
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
@@ -144,6 +144,9 @@ ${price}
 매물 정보:
 - 위치: ${location}
 - 평수: ${area}
+${rooms ? `- 방 개수: ${rooms}` : ''}
+${bathrooms ? `- 욕실: ${bathrooms}` : ''}
+${floor ? `- 층수: ${floor}` : ''}
 - 가격/거래 유형: ${price}
 ${additionalInfo ? `- 추가 정보: ${additionalInfo}` : ''}
 ${imageInstructions}
@@ -161,6 +164,12 @@ ${imageInstructions}
 - "25" → 25평
 - "25평" → 25평
 - "82.5" → 약 25평
+
+설명문 길이:
+${length === 'short' ? '- 4-5줄로 간결하게 작성' : length === 'long' ? '- 8-9줄로 상세하게 작성' : '- 5-6줄로 작성'}
+
+필수 준수사항:
+1. 거래 유형을 명확히 표시 (매매/전세/월세/반전세/단기)
 
 필수 준수사항:
 1. 거래 유형을 명확히 표시 (매매/전세/월세/반전세/단기)

@@ -9,6 +9,10 @@ export default function Home() {
     area: '',
     price: '',
     location: '',
+    rooms: '',
+    bathrooms: '',
+    floor: '',
+    length: 'normal',
     additionalInfo: ''
   });
   const [description, setDescription] = useState('');
@@ -65,6 +69,10 @@ export default function Home() {
           area: propertyInfo.area,
           price: propertyInfo.price,
           location: propertyInfo.location,
+          rooms: propertyInfo.rooms,
+          bathrooms: propertyInfo.bathrooms,
+          floor: propertyInfo.floor,
+          length: propertyInfo.length,
           additionalInfo: propertyInfo.additionalInfo,
           tone: tone || 'normal',
           images: imagesBase64,
@@ -165,6 +173,81 @@ export default function Home() {
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600 text-gray-900"
               />
             </div>
+          </div>
+           {/* 상세 정보 */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <span className="text-xl mr-2">🚪</span>
+              방 개수
+            </label>
+            <select
+              value={propertyInfo.rooms}
+              onChange={(e) => setPropertyInfo({...propertyInfo, rooms: e.target.value})}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+            >
+              <option value="">선택</option>
+              <option value="원룸">원룸</option>
+              <option value="1개">1개</option>
+              <option value="2개">2개</option>
+              <option value="3개">3개</option>
+              <option value="4개 이상">4개 이상</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <span className="text-xl mr-2">🚿</span>
+              욕실
+            </label>
+            <select
+              value={propertyInfo.bathrooms}
+              onChange={(e) => setPropertyInfo({...propertyInfo, bathrooms: e.target.value})}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+            >
+              <option value="">선택</option>
+              <option value="1개">1개</option>
+              <option value="2개">2개</option>
+              <option value="3개 이상">3개 이상</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <span className="text-xl mr-2">🏢</span>
+              층수
+            </label>
+            <select
+              value={propertyInfo.floor}
+              onChange={(e) => setPropertyInfo({...propertyInfo, floor: e.target.value})}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+            >
+              <option value="">선택</option>
+              <option value="반지하">반지하</option>
+              <option value="1층">1층</option>
+              <option value="2층">2층</option>
+              <option value="3-5층">3-5층</option>
+              <option value="6-10층">6-10층</option>
+              <option value="고층">고층</option>
+              <option value="옥탑">옥탑</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <span className="text-xl mr-2">📏</span>
+              길이
+            </label>
+            <select
+              value={propertyInfo.length}
+              onChange={(e) => setPropertyInfo({...propertyInfo, length: e.target.value})}
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+            >
+              <option value="short">짧게</option>
+              <option value="normal">보통</option>
+              <option value="long">길게</option>
+            </select>
+              </div>
           </div>
 
           <div className="mb-8">
