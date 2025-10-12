@@ -117,7 +117,7 @@ export default function Home() {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
             매물 설명문, 이제 쉽게 써보세요
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-gray-900">
             정보만 입력하면 AI가 멋진 소개글을 만들어드려요 ✨
           </p>
         </div>
@@ -134,7 +134,7 @@ export default function Home() {
                 placeholder="25평 또는 25"
                 value={propertyInfo.area}
                 onChange={(e) => setPropertyInfo({...propertyInfo, area: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600 text-gray-900"
               />
             </div>
             
@@ -148,7 +148,7 @@ export default function Home() {
                 placeholder="매매: 5억 | 전세: 3억 | 월세: 500/50"
                 value={propertyInfo.price}
                 onChange={(e) => setPropertyInfo({...propertyInfo, price: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600 text-gray-900"
               />
             </div>
             
@@ -162,7 +162,7 @@ export default function Home() {
                 placeholder="강남구 역삼동"
                 value={propertyInfo.location}
                 onChange={(e) => setPropertyInfo({...propertyInfo, location: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600 text-gray-900"
               />
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function Home() {
               placeholder="예: 반려동물 가능, 보증보험 가입 가능, 전세자금대출 가능, 리모델링 완료, 즉시 입주 가능 등"
               value={propertyInfo.additionalInfo}
               onChange={(e) => setPropertyInfo({...propertyInfo, additionalInfo: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600 resize-none h-24"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600 text-gray-900 resize-none h-24"
             />
             <p className="text-xs text-gray-500 mt-2">
               💡 보증보험, 반려동물, 주차, 옵션 등 특별히 강조하고 싶은 내용을 적어주세요
@@ -376,7 +376,7 @@ export default function Home() {
 
       <footer className="border-t border-gray-200 mt-20 py-8">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 text-gray-900 text-sm">
             © 2025 방글방글. 🏠 AI로 쉽고 빠르게!
           </p>
         </div>
