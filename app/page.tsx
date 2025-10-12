@@ -8,11 +8,12 @@ export default function Home() {
   const [propertyInfo, setPropertyInfo] = useState({
     area: '',
     price: '',
-    location: ''
+    location: '',
+    additionalInfo: ''
   });
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
-  const [toneLoading, setToneLoading] = useState<string | null>(null); // 어떤 톤 버튼이 로딩중인지
+  const [toneLoading, setToneLoading] = useState<string | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -45,7 +46,7 @@ export default function Home() {
     }
 
     if (tone) {
-      setToneLoading(tone); // 톤 버튼 로딩 시작
+      setToneLoading(tone);
     } else {
       setLoading(true);
     }
@@ -64,6 +65,7 @@ export default function Home() {
           area: propertyInfo.area,
           price: propertyInfo.price,
           location: propertyInfo.location,
+          additionalInfo: propertyInfo.additionalInfo,
           tone: tone || 'normal',
           images: imagesBase64,
         }),
@@ -82,7 +84,7 @@ export default function Home() {
       alert('AI 생성 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
-      setToneLoading(null); // 톤 버튼 로딩 종료
+      setToneLoading(null);
     }
   };
 
@@ -93,7 +95,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* 헤더 */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center space-x-3">
@@ -108,9 +109,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 메인 컨텐츠 */}
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* 타이틀 */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-black rounded-3xl mx-auto mb-4 flex items-center justify-center">
             <span className="text-3xl">🏠</span>
@@ -123,10 +122,8 @@ export default function Home() {
           </p>
         </div>
 
-        {/* 메인 카드 */}
         <div className="bg-white rounded-3xl shadow-xl p-8 mb-8">
-          {/* 입력 필드 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
               <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                 <span className="text-xl mr-2">📐</span>
@@ -134,7 +131,7 @@ export default function Home() {
               </label>
               <input
                 type="text"
-                placeholder="예: 32평"
+                placeholder="25평 또는 25"
                 value={propertyInfo.area}
                 onChange={(e) => setPropertyInfo({...propertyInfo, area: e.target.value})}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
@@ -148,7 +145,7 @@ export default function Home() {
               </label>
               <input
                 type="text"
-                placeholder="예: 5억 2천만원"
+                placeholder="매매: 5억 | 전세: 3억 | 월세: 500/50"
                 value={propertyInfo.price}
                 onChange={(e) => setPropertyInfo({...propertyInfo, price: e.target.value})}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
@@ -162,7 +159,7 @@ export default function Home() {
               </label>
               <input
                 type="text"
-                placeholder="예: 강남구 역삼동"
+                placeholder="강남구 역삼동"
                 value={propertyInfo.location}
                 onChange={(e) => setPropertyInfo({...propertyInfo, location: e.target.value})}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600"
@@ -170,7 +167,22 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 이미지 업로드 */}
+          <div className="mb-8">
+            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+              <span className="text-xl mr-2">💬</span>
+              추가 정보 (선택)
+            </label>
+            <textarea
+              placeholder="예: 반려동물 가능, 보증보험 가입 가능, 전세자금대출 가능, 리모델링 완료, 즉시 입주 가능 등"
+              value={propertyInfo.additionalInfo}
+              onChange={(e) => setPropertyInfo({...propertyInfo, additionalInfo: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all placeholder:text-gray-600 resize-none h-24"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              💡 보증보험, 반려동물, 주차, 옵션 등 특별히 강조하고 싶은 내용을 적어주세요
+            </p>
+          </div>
+
           <div className="mb-8">
             <label className="flex items-center text-sm font-medium text-gray-700 mb-4">
               <span className="text-xl mr-2">📷</span>
@@ -199,7 +211,6 @@ export default function Home() {
               </label>
             </div>
 
-            {/* 이미지 미리보기 */}
             {images.length > 0 && (
               <div className="mt-6 grid grid-cols-3 md:grid-cols-6 gap-4">
                 {images.map((img, idx) => (
@@ -224,7 +235,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* 생성 버튼 */}
           <button
             onClick={() => generateDescription()}
             disabled={loading}
@@ -247,10 +257,8 @@ export default function Home() {
           </button>
         </div>
 
-        {/* 결과 */}
         {description && (
           <div className="space-y-6 animate-fadeIn">
-            {/* 설명문 카드 */}
             <div className="bg-white rounded-3xl shadow-xl p-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-gray-900 flex items-center">
@@ -270,14 +278,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 톤 조절 */}
             <div className="bg-white rounded-3xl shadow-xl p-6">
               <p className="text-sm font-medium text-gray-700 mb-4">💫 톤 변경하기</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button 
                   onClick={() => generateDescription('professional')}
                   disabled={loading || toneLoading !== null}
-                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700 relative"
+                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700"
                 >
                   {toneLoading === 'professional' ? (
                     <span className="flex items-center justify-center">
@@ -297,7 +304,7 @@ export default function Home() {
                 <button 
                   onClick={() => generateDescription('friendly')}
                   disabled={loading || toneLoading !== null}
-                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700 relative"
+                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700"
                 >
                   {toneLoading === 'friendly' ? (
                     <span className="flex items-center justify-center">
@@ -317,7 +324,7 @@ export default function Home() {
                 <button 
                   onClick={() => generateDescription('luxury')}
                   disabled={loading || toneLoading !== null}
-                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700 relative"
+                  className="px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-400 hover:bg-purple-50 transition-all disabled:opacity-50 font-medium text-gray-700"
                 >
                   {toneLoading === 'luxury' ? (
                     <span className="flex items-center justify-center">
@@ -337,7 +344,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 복사 버튼 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <button 
                 onClick={() => {
@@ -368,7 +374,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* 푸터 */}
       <footer className="border-t border-gray-200 mt-20 py-8">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-gray-600 text-sm">
