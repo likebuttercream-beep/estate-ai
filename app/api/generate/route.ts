@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
     }
 
     let toneInstruction = '';
-    let examples = '';
     
     if (tone === 'professional') {
       toneInstruction = `당신은 20년 경력의 프리미엄 부동산 컨설턴트입니다.
